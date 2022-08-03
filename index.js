@@ -33,12 +33,16 @@ const promptUser = () => {
         case "View All Employees":
           employeeDisplay();
           break;
+        case "Add A Department":
+          addDepartment();
+          break;
+        case "Add A Role":
+          addRole();
+          break;
         case "Exit":
           process.exit();
         default:
           promptUser();
-        // "Add A Department",
-        // "Add A Role",
         // "Add An Employee",
         // "Update An Employee Role",
       }
@@ -93,6 +97,12 @@ function employeeDisplay() {
 
 // Function to Add a Department
 const addDepartment = () => {
+  console.log(`
+=====================
+Add a New Department
+=====================
+`);
+
   return inquirer
     .prompt([
       {
@@ -111,12 +121,11 @@ const addDepartment = () => {
     ])
     .then((deptData) => {
       db.query(
-        `INSERT INTO department (name) 
-        VALUES ('${deptData.name}');`,
+        `INSERT INTO department (name)
+      VALUES ('${deptData.name}');`,
         (err) => {
           if (err) {
             return console.error(err.message);
-            addDepartment();
           }
           console.log("Department Added!");
           promptUser();
@@ -127,58 +136,65 @@ const addDepartment = () => {
 
 // Function to Add a Role
 const addRole = () => {
-  const departments = db.query("SELECT name FROM DEPARTMENT");
-  return inquirer
-    .prompt([
-      {
-        type: "input",
-        name: "name",
-        message: "What is the name of the role? (Required)",
-        validate: (roleInput) => {
-          if (roleInput) {
-            return true;
-          } else {
-            console.log("Please enter the name of the role!");
-            return false;
-          }
-        },
-      },
-      {
-        type: "input",
-        name: "salary",
-        message:
-          "What is the salary of the role? (Required - enter integer value)",
-        validate: (salaryInput) => {
-          const number = Number.isInteger(salaryInput);
-          if (salaryInput && number) {
-            return true;
-          } else {
-            console.log("Please enter a salary for the role!");
-            return false;
-          }
-        },
-      },
-      {
-        type: "list",
-        name: "name",
-        message: "What is the name of the role? (Required)",
-        choices: departments,
-      },
-    ])
-    .then((roleData) => {
-      db.query(
-        `INSERT INTO department (name) 
-        VALUES ('${roleData.name}');`,
-        (err) => {
-          if (err) {
-            return console.error(err.message);
-            addRole();
-          }
-          console.log("Department Added!");
-          promptUser();
-        }
-      );
-    });
+  db.query(`SELECT * FROM DEPARTMENT`, (err, result) => {
+    if (err) {
+      return console.error(err.message);
+    } else {
+      const deptChoices = result.map(({ name }) => name);
+      inquirer
+        .prompt([
+          {
+            type: "input",
+            name: "name",
+            message: "What is the name of the role? (Required)",
+            validate: (roleInput) => {
+              if (roleInput) {
+                return true;
+              } else {
+                console.log("Please enter the name of the role!");
+                return false;
+              }
+            },
+          },
+          {
+            type: "input",
+            name: "salary",
+            message:
+              "What is the salary of the role? (Required - enter integer value)",
+            validate: (salaryInput) => {
+              const number = !isNaN(salaryInput);
+              if (salaryInput && number) {
+                return true;
+              } else {
+                console.log("Please enter a valid salary for the role!");
+                return false;
+              }
+            },
+          },
+          {
+            type: "list",
+            name: "department",
+            message: "Which department does the role belong to? (Required)",
+            choices: deptChoices,
+          },
+        ])
+        .then((roleData) => {
+          db.query(
+            `INSERT INTO role (title, salary, department_id)
+                VALUES ("${roleData.name}", ${roleData.salary}, ${
+              deptChoices.indexOf(roleData.department) + 1
+            })`,
+            (err) => {
+              if (err) {
+                return console.error(err.message);
+              }
+              console.log("Department Added!");
+              promptUser();
+            }
+          );
+        });
+    }
+  });
 };
 
 // Initalize Function
