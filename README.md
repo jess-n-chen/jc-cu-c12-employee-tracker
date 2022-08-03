@@ -3,7 +3,7 @@
 ## Columbia University Bootcamp - SQL Challenge: Employee Tracker
 
 > This repository contains my command-line application that allows an end user to manage a company's employee database.
-> Link to Walkthrough Video:
+> Link to Walkthrough Video: https://drive.google.com/file/d/12U9Cn9xLc2Q8RK7W6VpoaLCRuqnh__5v/view
 
 ## Table of Contents
 
@@ -64,6 +64,8 @@ THEN I am prompted to select an employee to update and their new role and this i
 3. Run `node index.js` in the command line to use the application.
 
 ## Screenshots
+
+Link to Walkthrough Video: https://drive.google.com/file/d/12U9Cn9xLc2Q8RK7W6VpoaLCRuqnh__5v/view
 
 ## Contact
 
